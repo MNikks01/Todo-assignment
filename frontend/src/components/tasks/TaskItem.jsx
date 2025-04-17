@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 // import { updateTask, deleteTask } from '../../features/tasks/tasksSlice'
-import { format } from 'date-fns'
+import { format, isValid } from 'date-fns'
 import { motion } from 'framer-motion'
 import { deleteTask, updateTask } from '../../store/slices/taskSlice'
 
@@ -10,22 +10,35 @@ const TaskItem = ({ task }) => {
     const [taskData, setTaskData] = useState(task)
     const dispatch = useDispatch()
 
+    const { user: { user: { _id: userId } } } = useSelector((state) => state.auth)
+
+
+    let date = new Date(task?.createdAt);
+    let formattedDate = isValid(date) ? format(date, "dd MMM yyyy") : "N/A";
+
+    // if (task?.createdAt) {
+    //     const date = new Date(task?.createdAt);
+    //     if (isValid(date)) {
+    //         formattedDate = format(date, "dd MMM yyyy");
+    //     }
+    // }
+
     const handleStatusChange = async () => {
         const updatedTask = {
             ...task,
             status: task.status === 'PENDING' ? 'DONE' : 'PENDING',
         }
-        dispatch(updateTask({ id: task._id, taskData: updatedTask }))
+        dispatch(updateTask({ id: task?._id, taskData: updatedTask }))
     }
 
     const handleUpdate = async (e) => {
         e.preventDefault()
-        dispatch(updateTask({ id: task._id, taskData }))
+        dispatch(updateTask({ id: task?._id, taskData }))
         setIsEditing(false)
     }
 
     const handleDelete = () => {
-        dispatch(deleteTask(task._id))
+        dispatch(deleteTask(task?._id))
     }
 
     return (
@@ -35,7 +48,7 @@ const TaskItem = ({ task }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className={`bg-white rounded-lg shadow overflow-hidden ${task.status === 'DONE' ? 'opacity-80' : ''
+            className={`bg-white rounded-lg shadow overflow-hidden ${task?.status === 'DONE' ? 'opacity-80' : ''
                 }`}
         >
             {isEditing ? (
@@ -91,7 +104,9 @@ const TaskItem = ({ task }) => {
                             </h3>
                             <p className="mt-1 text-sm text-gray-600">{task?.description}</p>
                             <p className="mt-2 text-xs text-gray-500">
-                                {format(new Date(task?.createdAt), 'MMM dd, yyyy h:mm a')}
+                                {formattedDate}
+                                {/* {format(task?.createdAt, 'MMM dd, yyyy h:mm a')} */}
+                                {/* {format(new Date(task?.createdAt), 'MMM dd, yyyy h:mm a')} */}
                             </p>
                         </div>
                         <div className="flex items-center space-x-2">

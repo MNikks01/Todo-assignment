@@ -1,16 +1,21 @@
 import { useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { setUser } from '../store/slices/authSlice'
 
 const useAuth = () => {
-    const { user } = useSelector((state) => state.auth)
+    const dispatch = useDispatch()
     const navigate = useNavigate()
+    const { user } = useSelector((state) => state.auth)
 
     useEffect(() => {
-        if (!user) {
+        const storedUser = JSON.parse(localStorage.getItem('user'))
+        if (!user && storedUser) {
+            dispatch(setUser(storedUser))
+        } else if (!user && !storedUser) {
             navigate('/login')
         }
-    }, [user, navigate])
+    }, [user, navigate, dispatch])
 
     return user
 }

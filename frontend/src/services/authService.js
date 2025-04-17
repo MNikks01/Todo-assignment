@@ -13,7 +13,6 @@ const register = async (userData) => {
 
 const login = async (userData) => {
     const response = await axios.post(API_URL + 'login', userData)
-    console.log('response ->', response)
     if (response.data) {
         localStorage.setItem('user', JSON.stringify(response.data))
     }

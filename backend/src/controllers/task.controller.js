@@ -3,6 +3,7 @@ import Task from '../models/task.model.js';
 import AppError from '../utils/appError.js';
 import mongoose from 'mongoose';
 
+// done and tested
 const getAllTasks = async (req, res, next) => {
     const { page = 1, limit = 10, status, search, sort } = req.query;
     // console.log('page', page, 'limit', limit, 'status', status, 'search', search, 'sort', sort);
@@ -19,7 +20,7 @@ const getAllTasks = async (req, res, next) => {
             .skip((page - 1) * limit)
             .limit(parseInt(limit));
 
-        const total = await Task.countDocuments(query);
+        const total = await Task.countDocuments({ user: userId });
 
         res.status(200).json({
             success: true,
@@ -71,11 +72,15 @@ const createTask = async (req, res, next) => {
         return res.status(500).json({ success: false, message: 'Failed to create task' });
     }
 }
+
+// done and tested
 const updateTask = async (req, res, next) => {
+    console.log('req.params.id', req.params.id);
+    console.log('req.body', req.body);
 
     try {
         const task = await Task.findOneAndUpdate(
-            { _id: req.params.id, user: req.user.id },
+            { _id: req.params.id },
             req.body,
             { new: true, runValidators: true }
         );
@@ -85,26 +90,36 @@ const updateTask = async (req, res, next) => {
         }
 
         res.status(200).json({
-            status: 'success',
-            data: {
-                task
-            }
+            success: true,
+            message: 'Task updated successfully',
+            task
         });
     } catch (error) {
         return next(new AppError(error.message, 400));
     }
 
 }
+
+// done and tested
 const deleteTask = async (req, res, next) => {
+    console.log('req.params.id', req.params.id);
+    // console.log('req.user.id', req.user.id);
+
+    const taskId = req.params.id;
+
+    if (!taskId)
+        return next(new AppError('No task found with that ID', 404));
+
     try {
-        const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+        const task = await Task.findOneAndDelete({ _id: taskId });
 
         if (!task) {
             return next(new AppError('No task found with that ID', 404));
         }
 
         res.status(204).json({
-            status: 'success',
+            success: true,
+            message: 'Task deleted successfully',
             data: null
         });
     } catch (error) {

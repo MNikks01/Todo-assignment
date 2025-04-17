@@ -24,6 +24,7 @@ const TaskList = () => {
         )
     }
 
+    console.log('tasks ->', tasks)
     console.log('filteredTasks ->', filteredTasks)
 
     return (
@@ -43,7 +44,7 @@ const TaskList = () => {
                     className="space-y-4"
                 >
                     {filteredTasks?.map((task) => (
-                        <TaskItem key={task._id} task={task} />
+                        <TaskItem key={task?._id} task={task} />
                     ))}
                 </motion.ul>
             )}

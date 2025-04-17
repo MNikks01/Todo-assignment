@@ -11,6 +11,8 @@ const Dashboard = () => {
     const navigate = useNavigate()
     const { user } = useSelector((state) => state.auth)
 
+    // const user = useAuth() // This will redirect to /login if not logged in
+
     useEffect(() => {
         if (!user) {
             navigate('/login')
